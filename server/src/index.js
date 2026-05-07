@@ -440,7 +440,7 @@ app.get(
       if (!projectId) {
         where.project = { ownerId: req.user.userId }
       }
-    } else {
+    } else if (!where.assigneeId) {
       where.assigneeId = req.user.userId
     }
 
