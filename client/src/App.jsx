@@ -675,8 +675,14 @@ function TasksSection({ tasks, currentUser, isAdmin, onRefresh, token }) {
 function TaskItem({ task, currentUser, isAdminOwner, onStatusChange }) {
   const canUpdate = isAdminOwner || task.assigneeId === currentUser.id
   const dueDate = task.dueDate ? new Date(task.dueDate) : null
+  const [now, setNow] = useState(null)
+
+  useEffect(() => {
+    setNow(Date.now())
+  }, [])
+
   const isOverdue =
-    dueDate && dueDate < new Date() && task.status !== 'DONE'
+    dueDate && now && dueDate.getTime() < now && task.status !== 'DONE'
 
   return (
     <div className="task-card">

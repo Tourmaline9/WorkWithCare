@@ -4,6 +4,7 @@ const morgan = require('morgan')
 const dotenv = require('dotenv')
 const bcrypt = require('bcryptjs')
 const jwt = require('jsonwebtoken')
+const rateLimit = require('express-rate-limit')
 const { z } = require('zod')
 const { PrismaClient } = require('@prisma/client')
 
@@ -12,15 +13,38 @@ dotenv.config()
 const app = express()
 const prisma = new PrismaClient()
 const PORT = process.env.PORT || 4000
-const JWT_SECRET = process.env.JWT_SECRET || 'dev-secret'
+const JWT_SECRET = process.env.JWT_SECRET
+if (!JWT_SECRET) {
+  throw new Error('JWT_SECRET is required')
+}
+
+const allowedOrigins = process.env.CLIENT_URL
+  ? process.env.CLIENT_URL.split(',')
+  : ['http://localhost:5173']
 
 app.use(
   cors({
-    origin: process.env.CLIENT_URL ? process.env.CLIENT_URL.split(',') : true,
+    origin: allowedOrigins,
   })
 )
 app.use(express.json())
 app.use(morgan('dev'))
+
+const apiLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  limit: 300,
+  standardHeaders: 'draft-7',
+  legacyHeaders: false,
+})
+
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  limit: 25,
+  standardHeaders: 'draft-7',
+  legacyHeaders: false,
+})
+
+app.use('/api', apiLimiter)
 
 const asyncHandler = (handler) => (req, res, next) =>
   Promise.resolve(handler(req, res, next)).catch(next)
@@ -152,6 +176,7 @@ app.get('/api/health', (req, res) => {
 
 app.post(
   '/api/auth/signup',
+  authLimiter,
   validateBody(signupSchema),
   asyncHandler(async (req, res) => {
     const { name, email, password, role, adminCode } = req.body
@@ -186,6 +211,7 @@ app.post(
 
 app.post(
   '/api/auth/login',
+  authLimiter,
   validateBody(loginSchema),
   asyncHandler(async (req, res) => {
     const { email, password } = req.body
@@ -395,6 +421,14 @@ app.get(
     const where = {}
 
     if (projectId) {
+      if (req.user.role === 'ADMIN') {
+        const project = await prisma.project.findFirst({
+          where: { id: projectId, ownerId: req.user.userId },
+        })
+        if (!project) {
+          return res.status(404).json({ message: 'Project not found' })
+        }
+      }
       where.projectId = projectId
     }
 
@@ -446,19 +480,23 @@ app.patch(
       return res.status(403).json({ message: 'Not authorized to update task' })
     }
 
-    const updates = { ...req.body }
-
     if (!isAdminOwner) {
-      const allowedUpdates = {}
-      if (updates.status) {
-        allowedUpdates.status = updates.status
+      if (!req.body.status) {
+        return res.status(400).json({ message: 'Status update required' })
       }
-      updates.title = undefined
-      updates.description = undefined
-      updates.assigneeId = undefined
-      updates.dueDate = undefined
-      Object.assign(updates, allowedUpdates)
+      const updatedTask = await prisma.task.update({
+        where: { id: task.id },
+        data: { status: req.body.status },
+        include: {
+          assignee: { select: { id: true, name: true, email: true } },
+          creator: { select: { id: true, name: true, email: true } },
+        },
+      })
+
+      return res.json({ task: updatedTask })
     }
+
+    const updates = { ...req.body }
 
     if (updates.dueDate !== undefined) {
       try {
