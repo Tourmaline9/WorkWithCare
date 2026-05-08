@@ -27,6 +27,9 @@ function App() {
 
   const isAdmin = user?.role === 'ADMIN'
 
+  const notificationCount =
+    dashboard?.notifications?.filter((item) => !item.readAt).length || 0
+
   return (
     <Routes>
       <Route path="/auth" element={<AuthPage onAuthSuccess={login} />} />
@@ -38,6 +41,7 @@ function App() {
               onLogout={logout}
               loading={loading}
               error={error}
+              notificationCount={notificationCount}
             />
           }
         >
@@ -48,6 +52,10 @@ function App() {
                 dashboard={dashboard}
                 isAdmin={isAdmin}
                 projects={projects}
+                tasks={assignedTasks}
+                currentUser={user}
+                token={token}
+                onRefresh={refresh}
               />
             }
           />

@@ -1,4 +1,4 @@
-import { NavLink, Outlet, useLocation } from 'react-router-dom'
+import { Link, NavLink, Outlet, useLocation } from 'react-router-dom'
 
 const links = [
   { to: '/', label: 'Dashboard' },
@@ -7,7 +7,13 @@ const links = [
   { to: '/tasks', label: 'My Work' }
 ]
 
-export default function AppLayout({ user, onLogout, loading, error }) {
+export default function AppLayout({
+  user,
+  onLogout,
+  loading,
+  error,
+  notificationCount = 0,
+}) {
   const isAdmin = user?.role === 'ADMIN'
   const location = useLocation()
 
@@ -61,8 +67,14 @@ export default function AppLayout({ user, onLogout, loading, error }) {
           <h1>{pageTitle}</h1>
           <div className="topbar-actions">
             <input type="search" placeholder="Search projects, tasks..." aria-label="Search" />
+            <Link to="/projects" className="primary-btn">
+              + New task
+            </Link>
             <button type="button" className="icon-btn" aria-label="Notifications">
               ⦿
+              {notificationCount > 0 && (
+                <span className="icon-badge">{notificationCount}</span>
+              )}
             </button>
             <span className="avatar">{user?.name?.slice(0, 1) || 'U'}</span>
           </div>
