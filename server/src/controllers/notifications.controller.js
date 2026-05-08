@@ -29,9 +29,13 @@ const markNotificationRead = async (req, res) => {
     return res.status(403).json({ message: 'Not authorized to update notification' })
   }
 
+  if (notification.readAt) {
+    return res.json({ notification })
+  }
+
   const updated = await prisma.notification.update({
     where: { id: notification.id },
-    data: { readAt: notification.readAt || new Date() },
+    data: { readAt: new Date() },
   })
 
   return res.json({ notification: updated })
