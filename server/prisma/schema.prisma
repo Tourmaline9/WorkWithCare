@@ -19,6 +19,9 @@ model User {
   memberships  ProjectMember[]
   assignedTasks Task[]         @relation("TaskAssignee")
   createdTasks Task[]          @relation("TaskCreator")
+  comments     TaskComment[]
+  notifications Notification[]
+  timeEntries  TimeEntry[]
 }
 
 model Project {
@@ -60,4 +63,41 @@ model Task {
   creator     User        @relation("TaskCreator", fields: [creatorId], references: [id])
   createdAt   DateTime    @default(now())
   updatedAt   DateTime    @updatedAt
+  comments    TaskComment[]
+  notifications Notification[]
+  timeEntries TimeEntry[]
+}
+
+model TaskComment {
+  id        String   @id @default(cuid())
+  body      String
+  taskId    String
+  task      Task     @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  authorId  String
+  author    User     @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+}
+
+model Notification {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type      String
+  message   String
+  taskId    String?
+  task      Task?    @relation(fields: [taskId], references: [id], onDelete: SetNull)
+  readAt    DateTime?
+  createdAt DateTime @default(now())
+}
+
+model TimeEntry {
+  id              String   @id @default(cuid())
+  userId          String
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  taskId          String
+  task            Task     @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  startedAt       DateTime @default(now())
+  endedAt         DateTime?
+  durationSeconds Int?
+  createdAt       DateTime @default(now())
 }
