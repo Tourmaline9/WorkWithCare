@@ -1,52 +1,79 @@
-import { NavLink, Outlet } from 'react-router-dom'
+import { NavLink, Outlet, useLocation } from 'react-router-dom'
 
-const getNavClass = ({ isActive }) =>
-  isActive ? 'nav-link active' : 'nav-link'
+const links = [
+  { to: '/', label: 'Dashboard' },
+  { to: '/projects', label: 'Projects' },
+  { to: '/board', label: 'Tasks' },
+  { to: '/tasks', label: 'My Work' }
+]
 
 export default function AppLayout({ user, onLogout, loading, error }) {
   const isAdmin = user?.role === 'ADMIN'
+  const location = useLocation()
+
+  const pageTitle =
+    links.find((item) => item.to !== '/' && location.pathname.startsWith(item.to))
+      ?.label || 'Dashboard'
 
   return (
-    <div className="app">
-      <header className="app-header">
-        <div>
-          <h1>WorkWithCare</h1>
-          <p className="subtitle">Team Task Manager</p>
+    <div className="app-shell">
+      <aside className="sidebar">
+        <div className="sidebar-top">
+          <div className="workspace-logo">WWC</div>
+          <div>
+            <strong>WorkWithCare</strong>
+            <p>Product Workspace</p>
+          </div>
         </div>
-        <nav className="nav">
-          <NavLink to="/" end className={getNavClass}>
-            Dashboard
-          </NavLink>
-          <NavLink to="/projects" className={getNavClass}>
-            Projects
-          </NavLink>
-          <NavLink to="/board" className={getNavClass}>
-            Task Board
-          </NavLink>
-          <NavLink to="/tasks" className={getNavClass}>
-            My Tasks
-          </NavLink>
+
+        <nav className="sidebar-nav">
+          {links.map((link) => (
+            <NavLink key={link.to} to={link.to} end={link.to === '/'} className="nav-link">
+              {link.label}
+            </NavLink>
+          ))}
           {isAdmin && (
-            <NavLink to="/team" className={getNavClass}>
+            <NavLink to="/team" className="nav-link">
               Team
             </NavLink>
           )}
+          <NavLink to="/settings" className="nav-link disabled" onClick={(e) => e.preventDefault()}>
+            Settings
+          </NavLink>
         </nav>
-        <div className="user-info">
-          <div>
-            <span className="user-name">{user?.name}</span>
-            <span className="user-role">{user?.role}</span>
+
+        <div className="sidebar-bottom">
+          <div className="user-chip">
+            <span className="avatar">{user?.name?.slice(0, 1) || 'U'}</span>
+            <div>
+              <div className="user-name">{user?.name}</div>
+              <div className="user-role">{user?.role}</div>
+            </div>
           </div>
           <button type="button" className="ghost" onClick={onLogout}>
-            Log out
+            Logout
           </button>
         </div>
-      </header>
-      <main>
-        {error && <div className="alert error">{error}</div>}
-        {loading && <div className="alert">Loading data...</div>}
-        <Outlet />
-      </main>
+      </aside>
+
+      <div className="content-area">
+        <header className="topbar">
+          <h1>{pageTitle}</h1>
+          <div className="topbar-actions">
+            <input type="search" placeholder="Search projects, tasks..." aria-label="Search" />
+            <button type="button" className="icon-btn" aria-label="Notifications">
+              ⦿
+            </button>
+            <span className="avatar">{user?.name?.slice(0, 1) || 'U'}</span>
+          </div>
+        </header>
+
+        <main>
+          {error && <div className="alert error">{error}</div>}
+          {loading && <div className="alert">Loading data...</div>}
+          <Outlet />
+        </main>
+      </div>
     </div>
   )
 }

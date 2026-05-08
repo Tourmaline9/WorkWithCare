@@ -1,16 +1,33 @@
 :root {
-  --bg: #0f172a;
-  --surface: #111827;
-  --card: #1e293b;
-  --border: #2f3c59;
-  --text: #f8fafc;
-  --muted: #94a3b8;
-  --primary: #38bdf8;
-  --primary-dark: #0ea5e9;
+  --bg: #f3f4f6;
+  --surface: #ffffff;
+  --card: #ffffff;
+  --border: #e5e7eb;
+  --text: #111827;
+  --muted: #6b7280;
+  --primary: #4f46e5;
+  --primary-dark: #4338ca;
   --success: #22c55e;
   --warning: #f59e0b;
   --danger: #ef4444;
 }
+
+
+.app-shell { display:grid; grid-template-columns:260px 1fr; min-height:100vh; background:var(--bg); }
+.sidebar { background:#f8fafc; border-right:1px solid var(--border); padding:1rem; display:flex; flex-direction:column; gap:1.2rem; }
+.sidebar-top { display:flex; gap:.75rem; align-items:center; padding:.5rem; }
+.workspace-logo { width:36px; height:36px; border-radius:10px; background:var(--primary); color:white; display:grid; place-items:center; font-weight:700; font-size:.75rem; }
+.sidebar-top p { margin:.2rem 0 0; color:var(--muted); font-size:.8rem; }
+.sidebar-nav { display:flex; flex-direction:column; gap:.35rem; }
+.sidebar-bottom { margin-top:auto; display:flex; flex-direction:column; gap:.75rem; }
+.content-area { display:flex; flex-direction:column; min-width:0; }
+.topbar { position:sticky; top:0; z-index:4; display:flex; justify-content:space-between; align-items:center; gap:1rem; padding:1rem 1.5rem; background:#fff; border-bottom:1px solid var(--border); }
+.topbar h1 { margin:0; font-size:1.1rem; }
+.topbar-actions { display:flex; align-items:center; gap:.75rem; }
+.topbar-actions input { min-width:260px; background:#f9fafb; }
+.icon-btn { width:34px; height:34px; border-radius:10px; border:1px solid var(--border); background:white; color:#6b7280; padding:0; }
+.avatar { width:32px; height:32px; border-radius:50%; background:#e0e7ff; color:#3730a3; display:grid; place-items:center; font-weight:700; font-size:.8rem; }
+.user-chip { display:flex; gap:.6rem; align-items:center; }
 
 .app {
   min-height: 100vh;
@@ -59,8 +76,11 @@
 }
 
 .nav-link.active {
+  background: #eef2ff;
+  color: #312e81;
+
   background: var(--primary);
-  color: #0b1120;
+  color: #ffffff;
   border-color: var(--primary);
   font-weight: 600;
 }
@@ -137,7 +157,7 @@ main {
   border: 1px solid var(--border);
   border-radius: 16px;
   padding: 1.25rem;
-  box-shadow: 0 16px 30px rgba(15, 23, 42, 0.3);
+  box-shadow: 0 6px 16px rgba(15, 23, 42, 0.06);
 }
 
 .summary-card {
@@ -176,7 +196,7 @@ main {
 }
 
 .tag {
-  background: rgba(56, 189, 248, 0.2);
+  background: #eef2ff;
   color: var(--primary);
   border-radius: 999px;
   padding: 0.25rem 0.75rem;
@@ -238,7 +258,7 @@ main {
 
 .chip.active,
 .chip:hover {
-  background: rgba(56, 189, 248, 0.2);
+  background: #eef2ff;
   border-color: var(--primary);
 }
 
@@ -277,7 +297,7 @@ main {
   border: 1px solid var(--border);
   border-radius: 14px;
   padding: 1rem;
-  background: rgba(15, 23, 42, 0.4);
+  background: #f9fafb;
 }
 
 .project-edit-actions {
@@ -307,7 +327,7 @@ main {
   width: 100%;
   height: 10px;
   border-radius: 999px;
-  background: rgba(148, 163, 184, 0.2);
+  background: #f3f4f6;
   overflow: hidden;
 }
 
@@ -373,7 +393,7 @@ main {
 }
 
 .task-card {
-  background: rgba(15, 23, 42, 0.6);
+  background: #ffffff;
   border: 1px solid var(--border);
   border-radius: 12px;
   padding: 0.75rem;
@@ -393,14 +413,14 @@ main {
   font-size: 0.75rem;
   padding: 0.2rem 0.5rem;
   border-radius: 999px;
-  background: rgba(148, 163, 184, 0.2);
+  background: #f3f4f6;
 }
 
 .priority-tag {
   font-size: 0.75rem;
   padding: 0.2rem 0.5rem;
   border-radius: 999px;
-  background: rgba(148, 163, 184, 0.2);
+  background: #f3f4f6;
   text-transform: uppercase;
   letter-spacing: 0.04em;
 }
@@ -473,7 +493,7 @@ main {
 }
 
 .board-column {
-  background: rgba(15, 23, 42, 0.5);
+  background: #f8fafc;
   border: 1px solid var(--border);
   border-radius: 16px;
   padding: 1rem;
@@ -505,7 +525,7 @@ main {
 }
 
 .board-card {
-  background: rgba(17, 24, 39, 0.8);
+  background: #ffffff;
   border: 1px solid var(--border);
   border-radius: 12px;
   padding: 0.75rem;
@@ -569,7 +589,7 @@ button {
 
 input,
 select {
-  background: rgba(15, 23, 42, 0.5);
+  background: #f8fafc;
   border: 1px solid var(--border);
   color: var(--text);
   padding: 0.5rem 0.7rem;
@@ -578,7 +598,7 @@ select {
 
 button {
   background: var(--primary);
-  color: #0b1120;
+  color: #ffffff;
   border: none;
   padding: 0.6rem 1.2rem;
   border-radius: 10px;
@@ -641,6 +661,11 @@ button:disabled {
   gap: 0.6rem;
   color: var(--muted);
 }
+
+@media (max-width: 960px) {
+  .app-shell { grid-template-columns:1fr; }
+  .sidebar { flex-direction:row; overflow:auto; border-right:none; border-bottom:1px solid var(--border); }
+  .sidebar-bottom { margin-top:0; flex-direction:row; align-items:center; }
 
 @media (max-width: 768px) {
   .app-header {
