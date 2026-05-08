@@ -1,29 +1,12 @@
 const prisma = require('../prisma/client')
-
-const getTaskForUser = async (taskId, user) =>
-  prisma.task.findUnique({
-    where: { id: taskId },
-    include: {
-      project: { include: { members: true } },
-    },
-  })
-
-const canAccessTask = (task, user) => {
-  if (!task) return false
-  const isAdminOwner =
-    user.role === 'ADMIN' && task.project.ownerId === user.userId
-  if (isAdminOwner) return true
-  if (task.assigneeId === user.userId) return true
-  if (task.creatorId === user.userId) return true
-  return task.project.members.some((member) => member.userId === user.userId)
-}
+const { getTaskWithProject, canAccessTask } = require('../utils/taskAccess')
 
 const listTimeEntries = async (req, res) => {
   const { taskId } = req.query
   const where = { userId: req.user.userId }
 
   if (taskId) {
-    const task = await getTaskForUser(taskId, req.user)
+    const task = await getTaskWithProject(taskId)
     if (!task) {
       return res.status(404).json({ message: 'Task not found' })
     }
@@ -49,7 +32,7 @@ const listTimeEntries = async (req, res) => {
 
 const startTimeEntry = async (req, res) => {
   const { taskId } = req.body
-  const task = await getTaskForUser(taskId, req.user)
+  const task = await getTaskWithProject(taskId)
   if (!task) {
     return res.status(404).json({ message: 'Task not found' })
   }
